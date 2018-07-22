@@ -1,0 +1,11 @@
+service: aws-certs-renew
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+functions:
+  app:
+    handler: handlers/app.handler
+    stage: ${opt:stage, 'dev'}
+    timeout: 300s
