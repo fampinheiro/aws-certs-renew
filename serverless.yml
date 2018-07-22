@@ -9,3 +9,5 @@ functions:
     handler: handlers/app.handler
     stage: ${opt:stage, 'dev'}
     timeout: 300s
+    events:
+      - schedule: rate(1 day)
