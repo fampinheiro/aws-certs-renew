@@ -1,38 +1,23 @@
 const Greenlock = require('greenlock');
-const capture = require('./capture');
 
 module.exports = async ({ domain, email, register }) => {
   const greenlock = Greenlock.create({
     version: 'draft-12',
+    configDir: '/tmp/acme-challenges',
     communityMember: false,
     challengeType: 'dns-01',
     challenges: {
-      'dns-01': require('le-challenge-dns')
+      'dns-01': require('./challenge')
     },
     server: 'https://acme-v02.api.letsencrypt.org/directory'
   });
 
-  const cachedCertificates = await greenlock.check({
-    domains: [domain]
+  return greenlock.register({
+    agreeTos: true,
+    email,
+    challengeType: 'dns-01',
+    rsaKeySize: 2048,
+    domains: [domain],
+    debug: true
   });
-
-  if (cachedCertificates) {
-    return cachedCertificates;
-  }
-
-  const listener = capture(domain, await register);
-  try {
-    const certificates = await greenlock.register({
-      agreeTos: true,
-      email,
-      challengeType: 'dns-01',
-      rsaKeySize: 2048,
-      domains: [domain],
-      debug: true
-    });
-    return certificates;
-  } catch (err) {
-    listener();
-    throw err;
-  }
 };

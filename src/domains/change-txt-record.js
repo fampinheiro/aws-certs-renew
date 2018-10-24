@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 
-module.exports = async ({ domain, secret }) => {
+module.exports = async ({ action, domain, secret }) => {
   const route53 = new AWS.Route53();
   const hostedZones = await route53
     .listHostedZonesByName({
@@ -8,7 +8,6 @@ module.exports = async ({ domain, secret }) => {
     })
     .promise();
 
-  const [type, value] = secret.split(' ');
   const hostedZone = hostedZones.HostedZones.filter(
     hz => hz.Name === `${domain}.`
   )[0];
@@ -19,20 +18,20 @@ module.exports = async ({ domain, secret }) => {
       ChangeBatch: {
         Changes: [
           {
-            Action: 'UPSERT',
+            Action: action,
             ResourceRecordSet: {
               Name: `_acme-challenge.${domain}`,
-              ResourceRecords: [
+              ResourceRecords: secret && [
                 {
-                  Value: `"${value}"`
+                  Value: `"${secret}"`
                 }
               ],
               TTL: 60,
-              Type: type
+              Type: 'TXT'
             }
           }
         ],
-        Comment: "Let's Encrypt Challenge"
+        Comment: 'greenlock txt challenge'
       },
       HostedZoneId: hostedZoneId
     })

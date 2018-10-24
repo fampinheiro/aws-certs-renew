@@ -13,8 +13,7 @@ module.exports = async () => {
 
     const { cert, chain, privkey } = await greenlock({
       email: details.AdminContact.Email,
-      domain: certificate.DomainName,
-      register: registerCertificate
+      domain: certificate.DomainName
     });
 
     await certificates.import({
@@ -41,12 +40,8 @@ async function getCertificates() {
   });
 
   return (await Promise.all(listDetails)).filter(c => {
-    const expireDate = subDays(parse(c.NotAfter), 7);
+    const expireDate = subDays(parse(c.NotAfter), 30);
 
     return isAfter(new Date(), expireDate);
   });
-}
-
-async function registerCertificate(opts) {
-  return domains.verification(opts);
 }

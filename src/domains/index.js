@@ -1,4 +1,4 @@
 module.exports = {
   details: require('./domain-details'),
-  verification: require('./domain-verification')
+  change: require('./change-txt-record')
 };

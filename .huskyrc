@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "commitmsg": "commitlint -E GIT_PARAMS",
+    "pre-commit": "npm test",
+    "precommit": "lint-staged",
+  }
+}
